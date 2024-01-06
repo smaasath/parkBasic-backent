@@ -78,17 +78,25 @@ WSGI_APPLICATION = 'parkBasic.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
+import dj_database_url
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'park_basic',
+        'USER': 'root',
+        'PASSWORD': '',  # Enter your database password if set
+        'HOST': 'localhost',
+        'PORT': '',
+        'OPTIONS': {
+            'sql_mode': 'STRICT_TRANS_TABLES',  # Set the appropriate SQL mode
+        },
     }
 }
 
-import dj_database_url
-
-DATABASES['default'] = dj_database_url.parse('mysql://root@localhost/park_basic')
+# Update the connection settings using dj_database_url
+db_from_env = dj_database_url.config()
+DATABASES['default'].update(db_from_env)
 
 
 # Password validation
