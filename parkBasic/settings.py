@@ -93,11 +93,11 @@ DATABASES = {
         },
     }
 }
-
+import os;
 # Update the connection settings using dj_database_url
-db_from_env = dj_database_url.config()
+DATABASE_URL = 'mysql://root:@localhost:3306/park_basic'
+db_from_env = dj_database_url.config(default=os.environ.get('DATABASE_URL', DATABASE_URL))
 DATABASES['default'].update(db_from_env)
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
