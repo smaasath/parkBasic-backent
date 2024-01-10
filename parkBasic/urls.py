@@ -17,12 +17,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path,re_path
 from django.urls import re_path as url
-from park_basic import authViews
+from park_basic import authViews, mathuView
 from  rest_framework.authtoken.views import obtain_auth_token
+
+
     
 
 urlpatterns = [
     re_path(r'^register$', authViews.RegisterApi),
     re_path(r'^login$', authViews.LoginApi),
+    re_path(r'^getBooking$', mathuView.GetAllBookingAPI),
     path('admin/', admin.site.urls),
 ]
