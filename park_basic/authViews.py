@@ -24,9 +24,14 @@ def RegisterApi(request):
         user_serializer = UserSerializer(data=user_data)
         if user_serializer.is_valid():
             email = user_data.get('email')
+            carNo = reserver_data.get('carNo')
             if User.objects.filter(email=email).exists():
                 return JsonResponse({
-                    "message": "email already registered",
+                    "message": "Email already registered",
+                }, status=400)
+            elif reserver.objects.filter(carNo=carNo).exists():
+                return JsonResponse({
+                    "message": "Car No already registered",
                 }, status=400)
             else:
                 user_instance = user_serializer.save()
@@ -55,12 +60,12 @@ def RegisterApi(request):
                 user_instance.delete()
                 return JsonResponse({
 
-                    "reserver_errors": reserver_serializer.errors
+                    "error": reserver_serializer.errors
                 }, status=400)
 
         return JsonResponse({
 
-                "user_errors": user_serializer.errors
+                "error": user_serializer.errors
             }, status=400)
 
 
