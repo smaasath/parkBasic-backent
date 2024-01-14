@@ -23,6 +23,6 @@ class bookingSlot(models.Model):
 
 class booking(models.Model):
     Date = models.CharField(max_length=20)
-    Time = models.IntegerField(max_length=10)
+    Time = models.IntegerField()
     reserverId = models.ForeignKey(reserver, on_delete=models.CASCADE)
     slotId = models.ForeignKey(bookingSlot, on_delete=models.CASCADE)
