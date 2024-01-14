@@ -87,7 +87,7 @@ DATABASES = {
         'USER': 'root',
         'PASSWORD': '',  # Enter your database password if set
         'HOST': 'localhost',
-        'PORT': '',
+        'PORT': '3306',
         'OPTIONS': {
             'sql_mode': 'STRICT_TRANS_TABLES',  # Set the appropriate SQL mode
         },
