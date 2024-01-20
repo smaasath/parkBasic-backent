@@ -10,11 +10,13 @@ class BookingSlotView(APIView):
     def get(self, request, *args, **kwargs):
         pk = kwargs.get('pk')
         if pk:
-            slot = bookingSlot.objects.filter(id=pk).first()
-            if slot:
+            try:
+                slot = bookingSlot.objects.get(id=pk)
                 serializer = BookingSlotSerializer(slot,many=False)
                 return Response({"data" : serializer.data})
-            else: return Response({"message" : "No such slot"},status=status.HTTP_400_BAD_REQUEST)
+
+            except bookingSlot.DoesNotExist:
+                return Response({"message": "Booking slot not found"}, status=status.HTTP_404_NOT_FOUND)
         else:
             slots = bookingSlot.objects.all()
             serializer = BookingSlotSerializer(slots, many=True)
@@ -39,13 +41,17 @@ class BookingSlotView(APIView):
         isValidSuperToken = userView.userViewSet.validateSuperToken(provided_token)
         if isValidSuperToken:
             pk = kwargs.get('pk')
-            slot = bookingSlot.objects.get(id=pk)
-            serializer = BookingSlotSerializer(instance=slot, data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response({"message": "Booking slot edit successfully"}, status=status.HTTP_200_OK)
-            else:
-                return Response({"message": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+            try:
+                slot = bookingSlot.objects.get(id=pk)
+                serializer = BookingSlotSerializer(instance=slot, data=request.data)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response({"message": "Booking slot edit successfully"}, status=status.HTTP_200_OK)
+                else:
+                    return Response({"message": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+            except bookingSlot.DoesNotExist:
+                return Response({"message": "Booking slot not found"}, status=status.HTTP_404_NOT_FOUND)
 
         else:
             return Response({"message": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
@@ -56,11 +62,13 @@ class BookingSlotView(APIView):
         isValidSuperToken = userView.userViewSet.validateSuperToken(provided_token)
         if isValidSuperToken:
             pk = kwargs.get('pk')
-            slot = bookingSlot.objects.get(id=pk)
-            if slot.delete():
+            try:
+                slot = bookingSlot.objects.get(id=pk)
+                slot.delete()
                 return Response({"message": "Booking slot deleted successfully"}, status=status.HTTP_200_OK)
-            else:
-                return Response({"message": "Booking slot not Delete"}, status=status.HTTP_400_BAD_REQUEST)
+
+            except bookingSlot.DoesNotExist:
+                return Response({"message": "Booking slot not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
         else:

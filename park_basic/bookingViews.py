@@ -56,12 +56,12 @@ class BookingViewSet(APIView):
     def get(self, request, *args, **kwargs):
         pk = kwargs.get('pk')
         if pk:
-            Booking = booking.objects.get(id=pk)
-            if Booking:
+            try:
+                Booking = booking.objects.get(id=pk)
                 data = self.getBookingDetails(Booking)
                 return Response({"data": data})
-            else:
-                return Response({"message": "No such Booking"}, status=status.HTTP_400_BAD_REQUEST)
+            except booking.DoesNotExist:
+                return Response({"message": "Booking not found"}, status=status.HTTP_404_NOT_FOUND)
         else:
             bookings = booking.objects.all()
             data = self.getAllDetailBooking(bookings)
@@ -103,4 +103,18 @@ class BookingViewSet(APIView):
         else:
             return Response({"message": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
 
-#
+    def delete(self, request, *args,**kwargs):
+        provided_token = request.META.get('HTTP_AUTHORIZATION')
+        isValidSuperToken = userView.userViewSet.validateSuperToken(provided_token)
+        if isValidSuperToken:
+            pk = kwargs.get('pk')
+            try:
+                booking_instance = booking.objects.get(id=pk)
+                booking_instance.delete()
+                return Response({"message": "Booking deleted successfully"}, status=status.HTTP_200_OK)
+            except booking.DoesNotExist:
+                return Response({"message": "Booking not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+        else:
+            return Response({"message": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
