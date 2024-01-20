@@ -19,7 +19,7 @@ from django.urls import path,re_path
 from django.urls import re_path as url
 from park_basic import authViews
 from park_basic import bookingViews
-from park_basic import authViews, mathuView,SlotView
+from park_basic import authViews,SlotView,bookingViews
 from  rest_framework.authtoken.views import obtain_auth_token
 
 
@@ -28,9 +28,9 @@ from  rest_framework.authtoken.views import obtain_auth_token
 urlpatterns = [
     re_path(r'^register$', authViews.RegisterApi),
     re_path(r'^login$', authViews.LoginApi),
-    re_path(r'^getBooking$', mathuView.GetAllBookingAPI),
     path('admin/', admin.site.urls),
-    # path('AddBooking/', bookingViews.insert_data),
+    path('booking/', bookingViews.BookingViewSet.as_view()),
+    path('booking/<int:pk>', bookingViews.BookingViewSet.as_view()),
     path('bookingSlots/', SlotView.BookingSlotView.as_view()),
     path('bookingSlots/<int:pk>', SlotView.BookingSlotView.as_view())
 ]

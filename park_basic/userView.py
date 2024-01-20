@@ -27,7 +27,7 @@ class userViewSet(APIView):
             try:
                 token_obj = Token.objects.get(key=token_key)
                 user = token_obj.user
-                return True
+                return user
             except Token.DoesNotExist:
                 return False
         else:
