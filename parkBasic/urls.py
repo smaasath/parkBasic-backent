@@ -30,7 +30,7 @@ urlpatterns = [
     re_path(r'^login$', authViews.LoginApi),
     re_path(r'^getBooking$', mathuView.GetAllBookingAPI),
     path('admin/', admin.site.urls),
-    path('AddBooking/', bookingViews.insert_data),
+    # path('AddBooking/', bookingViews.insert_data),
     path('bookingSlots/', SlotView.BookingSlotView.as_view()),
     path('bookingSlots/<int:pk>', SlotView.BookingSlotView.as_view())
 ]
