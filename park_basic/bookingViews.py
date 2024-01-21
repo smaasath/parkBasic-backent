@@ -23,15 +23,35 @@ class BookingViewSet(APIView):
                         'last_name': user_instance.last_name,
                         'email': user_instance.email,
                     }
-                    reserver_data = ReserverSerializer(reserver_instance).data
-                    booking_data = BookingSerializer(booking_instance).data
-                    all_data = {
-                        'booking_data': booking_data,
-                        'reserver_data': reserver_data,
-                        'user_data': user_data,
 
-                    }
-                    data.append(all_data)
+                    bookingslot_instance = booking_instance.slotId
+
+                    if bookingslot_instance:
+                        bookingSlotData = {
+                            'id' : bookingslot_instance.id,
+                            'slotName' : bookingslot_instance.slotName
+                        }
+
+                        bookinTime_instance = booking_instance.timeId
+
+                        if bookinTime_instance:
+                            bookingTimeData = {
+                                'id' : bookinTime_instance.id,
+                                'bookingTime' : bookinTime_instance.bookingTime
+                            }
+
+                            reserver_data = ReserverSerializer(reserver_instance).data
+                            booking_data = BookingSerializer(booking_instance).data
+                            all_data = {
+                                'booking_data': booking_data,
+                                'reserver_data': reserver_data,
+                                'user_data': user_data,
+                                'booking_slot_data': bookingSlotData,
+                                'booking_time_data': bookingTimeData
+
+                            }
+                            data.append(all_data)
+
         return data
 
     def getBookingDetails(self, booking_instance):
