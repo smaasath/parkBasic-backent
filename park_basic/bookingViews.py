@@ -1,15 +1,16 @@
-from .serializers import UserSerializer, ReserverSerializer, BookingSerializer,bookingSlot
+from .serializers import UserSerializer, ReserverSerializer, BookingSerializer, bookingSlot
 from rest_framework.authtoken.views import Token
 from rest_framework import status
-from .models import reserver, User,booking,bookingSlot
+from .models import reserver, User, booking, bookingSlot
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from park_basic import userView
 from django.utils import timezone
 
+
 class BookingViewSet(APIView):
 
-    def getAllDetailBooking(self,bookings):
+    def getAllDetailBooking(self, bookings):
         data = []
         for booking_instance in bookings:
             reserver_instance = booking_instance.reserverId
@@ -53,6 +54,7 @@ class BookingViewSet(APIView):
                 }
                 return all_data
         return None
+
     def get(self, request, *args, **kwargs):
         pk = kwargs.get('pk')
         if pk:
@@ -68,8 +70,9 @@ class BookingViewSet(APIView):
             return Response({"data": data})
 
     def post(self, request, *args, **kwargs):
+        userTokens = userView.userViewSet()
         provided_token = request.META.get('HTTP_AUTHORIZATION')
-        isValidToken = userView.userViewSet.validateToken(provided_token)
+        isValidToken = userTokens.validateToken(provided_token)
 
         if isValidToken:
             current_time = timezone.now().time()
@@ -77,35 +80,36 @@ class BookingViewSet(APIView):
             Reserver = reserver.objects.filter(userId=isValidToken.id).first()
             reserver_id = Reserver.id
             booking_serializer = BookingSerializer(data={
-                                "Date" : current_date,
-                                "Time" : current_time,
-                                "reserverId" : reserver_id,
-                                "timeId" : request.data.get('timeId'),
-                                "slotId" : request.data.get('slotId')
-                            })
+                "Date": current_date,
+                "Time": current_time,
+                "reserverId": reserver_id,
+                "timeId": request.data.get('timeId'),
+                "slotId": request.data.get('slotId')
+            })
             bookings = booking.objects.filter(Date=current_date,
                                               timeId=request.data.get('timeId'),
                                               slotId=request.data.get('slotId')).first()
 
             if bookings:
-                return Response({"message" : "Already Slots Booked"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"message": "Already Slots Booked"}, status=status.HTTP_400_BAD_REQUEST)
 
             else:
                 if booking_serializer.is_valid():
                     if booking_serializer.save():
                         return Response({"message": "Booking Booked successfully"}, status=status.HTTP_200_OK)
                     else:
-                        return Response({"message" : "Booked Failed"}, status=status.HTTP_400_BAD_REQUEST)
+                        return Response({"message": "Booked Failed"}, status=status.HTTP_400_BAD_REQUEST)
 
                 else:
-                    return Response({"message" : booking_serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({"message": booking_serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
         else:
             return Response({"message": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
 
-    def delete(self, request, *args,**kwargs):
+    def delete(self, request, *args, **kwargs):
+        userTokens = userView.userViewSet()
         provided_token = request.META.get('HTTP_AUTHORIZATION')
-        isValidSuperToken = userView.userViewSet.validateSuperToken(provided_token)
+        isValidSuperToken = userTokens.validateSuperToken(provided_token)
         if isValidSuperToken:
             pk = kwargs.get('pk')
             try:

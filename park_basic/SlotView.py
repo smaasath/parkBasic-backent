@@ -23,8 +23,9 @@ class BookingSlotView(APIView):
             return Response({"data" : serializer.data})
 
     def post(self, request, *args,**kwargs):
+        userTokens = userView.userViewSet()
         provided_token = request.META.get('HTTP_AUTHORIZATION')
-        isValidSuperToken = userView.userViewSet.validateSuperToken(provided_token)
+        isValidSuperToken = userTokens.validateSuperToken(provided_token)
         if isValidSuperToken:
             serializer = BookingSlotSerializer(data=request.data)
             if serializer.is_valid():
@@ -37,8 +38,9 @@ class BookingSlotView(APIView):
 
 
     def put(self, request, *args, **kwargs):
+        userTokens = userView.userViewSet()
         provided_token = request.META.get('HTTP_AUTHORIZATION')
-        isValidSuperToken = userView.userViewSet.validateSuperToken(provided_token)
+        isValidSuperToken = userTokens.validateSuperToken(provided_token)
         if isValidSuperToken:
             pk = kwargs.get('pk')
             try:
@@ -58,8 +60,9 @@ class BookingSlotView(APIView):
 
 
     def delete(self, request, *args,**kwargs):
+        userTokens = userView.userViewSet()
         provided_token = request.META.get('HTTP_AUTHORIZATION')
-        isValidSuperToken = userView.userViewSet.validateSuperToken(provided_token)
+        isValidSuperToken =userTokens.validateSuperToken(provided_token)
         if isValidSuperToken:
             pk = kwargs.get('pk')
             try:

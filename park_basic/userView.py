@@ -1,13 +1,14 @@
-from .serializers import UserSerializer, ReserverSerializer, BookingSerializer,bookingSlot
+from .serializers import UserSerializer, ReserverSerializer, BookingSerializer, bookingSlot
 from rest_framework.authtoken.views import Token
 from rest_framework import status, viewsets
-from .models import reserver, User,booking,bookingSlot
+from .models import reserver, User, booking, bookingSlot
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import ReserverSerializer,UserSerializer
+from .serializers import ReserverSerializer, UserSerializer
+
 
 class userViewSet(APIView):
-    def validateSuperToken(self,token):
+    def validateSuperToken(self, token):
         if token and token.startswith('Bearer '):
             token_key = token.split(' ')[1]
             try:
@@ -22,7 +23,7 @@ class userViewSet(APIView):
         else:
             return False
 
-    def validateToken(self,token):
+    def validateToken(self, token):
         if token and token.startswith('Bearer '):
             token_key = token.split(' ')[1]
             try:
@@ -45,13 +46,12 @@ class userViewSet(APIView):
             try:
                 Reserver = reserver.objects.get(userId=userId)
                 ReserverInstance = ReserverSerializer(instance=Reserver)
-                return Response({"Userdata":userData,
-                                 "ReserverData":ReserverInstance.data},status=status.HTTP_200_OK)
-            except bookingSlot.DoesNotExist:
+                return Response({"Userdata": userData,
+                                 "ReserverData": ReserverInstance.data}, status=status.HTTP_200_OK)
+            except reserver.DoesNotExist:
                 return Response({"message": "Reserver Not Found"}, status=status.HTTP_404_NOT_FOUND)
         else:
             return Response({"message": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
-
 
     def put(self, request, *args, **kwargs):
         provided_token = request.META.get('HTTP_AUTHORIZATION')
@@ -60,30 +60,29 @@ class userViewSet(APIView):
         if isValidToken:
             userId = isValidToken.id
             user_data = request.data.get('user', {})
-            reserver_data =request.data.get('reserver', {})
-            # return Response({"Userdata":reserverInstance.carNo})
+            reserver_data = request.data.get('reserver', {})
 
             try:
                 reserverInstance = reserver.objects.get(userId=userId)
-                userInstance = UserSerializer(instance=isValidToken, data=user_data,partial=True)
+                userInstance = UserSerializer(instance=isValidToken, data=user_data, partial=True)
                 if userInstance.is_valid():
                     userInstance.save()
-                    reserverInstance = ReserverSerializer(instance=reserverInstance,data=reserver_data,partial=True)
+                    reserverInstance = ReserverSerializer(instance=reserverInstance, data=reserver_data, partial=True)
                     if reserverInstance.is_valid():
                         reserverInstance.save()
-                        return Response({"message" : "sec"},status=status.HTTP_200_OK)
+                        return Response({"message": "user updated successfully"}, status=status.HTTP_200_OK)
                     else:
                         return Response({"message": reserverInstance.errors}, status=status.HTTP_400_BAD_REQUEST)
-                else: return Response({"Message": userInstance.errors}, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    return Response({"Message": userInstance.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-            except bookingSlot.DoesNotExist:
+            except reserver.DoesNotExist:
                 return Response({"message": "user not found"}, status=status.HTTP_404_NOT_FOUND)
 
         else:
             return Response({"message": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
 
-
-    def delete(self, request, *args,**kwargs):
+    def delete(self, request, *args, **kwargs):
         provided_token = request.META.get('HTTP_AUTHORIZATION')
         isValidToken = self.validateToken(provided_token)
         if isValidToken:
@@ -94,16 +93,9 @@ class userViewSet(APIView):
                 isValidToken.delete()
                 return Response({"message": "user deleted successfully"}, status=status.HTTP_200_OK)
 
-            except bookingSlot.DoesNotExist:
+            except reserver.DoesNotExist:
                 return Response({"message": "user not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
         else:
             return Response({"message": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
-
-
-
-
-
-
-
