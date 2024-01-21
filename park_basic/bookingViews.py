@@ -65,15 +65,54 @@ class BookingViewSet(APIView):
                     'last_name': user_instance.last_name,
                     'email': user_instance.email,
                 }
-                reserver_data = ReserverSerializer(reserver_instance).data
-                booking_data = BookingSerializer(booking_instance).data
-                all_data = {
-                    'booking_data': booking_data,
-                    'reserver_data': reserver_data,
-                    'user_data': user_data,
-                }
-                return all_data
+
+                bookingslot_instance = booking_instance.slotId
+
+                if bookingslot_instance:
+                    bookingSlotData = {
+                        'id': bookingslot_instance.id,
+                        'slotName': bookingslot_instance.slotName
+                    }
+
+                    bookinTime_instance = booking_instance.timeId
+
+                    if bookinTime_instance:
+                        bookingTimeData = {
+                            'id': bookinTime_instance.id,
+                            'bookingTime': bookinTime_instance.bookingTime
+                        }
+
+                        reserver_data = ReserverSerializer(reserver_instance).data
+                        booking_data = BookingSerializer(booking_instance).data
+                        all_data = {
+                            'booking_data': booking_data,
+                            'reserver_data': reserver_data,
+                            'user_data': user_data,
+                            'booking_slot_data': bookingSlotData,
+                            'booking_time_data': bookingTimeData
+
+                        }
+                        return all_data
         return None
+        # reserver_instance = booking_instance.reserverId
+        # if reserver_instance:
+        #     user_instance = reserver_instance.userId
+        #
+        #     if user_instance:
+        #         user_data = {
+        #             'first_name': user_instance.first_name,
+        #             'last_name': user_instance.last_name,
+        #             'email': user_instance.email,
+        #         }
+        #         reserver_data = ReserverSerializer(reserver_instance).data
+        #         booking_data = BookingSerializer(booking_instance).data
+        #         all_data = {
+        #             'booking_data': booking_data,
+        #             'reserver_data': reserver_data,
+        #             'user_data': user_data,
+        #         }
+        #         return all_data
+        # return None
 
     def get(self, request, *args, **kwargs):
         pk = kwargs.get('pk')
