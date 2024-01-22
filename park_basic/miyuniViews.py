@@ -17,8 +17,8 @@ def bookingApi(request,id=0):
     #update booking details
     elif request.method=='PUT':
         booking_data=JSONParser().parse(request)
-        booking=booking.objects.get(id=id)
-        booking_serializer=bookingSerializer(booking,data=booking_data)
+        bookingS=booking.objects.get(id=id)
+        booking_serializer=bookingSerializer(bookingS,data=booking_data)
         if booking_serializer.is_valid():
             booking_serializer.save()
             return JsonResponse("Updated Successfully",safe=False)
