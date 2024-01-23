@@ -169,6 +169,8 @@ class BookingViewSet(APIView):
             pk = kwargs.get('pk')
             current_time = timezone.now().time()
             current_date = timezone.now().date()
+            request.data['Date'] = current_date
+            request.data['Time'] = current_time
 
             try:
                 Reserver = reserver.objects.get(userId=isValidToken.id)
@@ -185,12 +187,7 @@ class BookingViewSet(APIView):
                             return Response({"message": "Slot already booked for this time"}, status=status.HTTP_400_BAD_REQUEST)
 
                         else:
-                            booking_serializer = BookingSerializer(booking_instance, data={
-                                "Date": current_date,
-                                "Time": current_time,
-                                "timeId": request.data.get('timeId'),
-                                "slotId": request.data.get('slotId')
-                            }, partial=True)
+                            booking_serializer = BookingSerializer(booking_instance, data=request.data, partial=True)
 
                             if booking_serializer.is_valid():
                                 booking_serializer.save()

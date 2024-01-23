@@ -36,5 +36,4 @@ urlpatterns = [
     path('user/', userView.userViewSet.as_view()),
     path('user/<int:pk>', userView.userViewSet.as_view()),
 
-
 ]
