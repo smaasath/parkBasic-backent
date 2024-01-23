@@ -6,6 +6,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from park_basic import userView
 from django.utils import timezone
+from rest_framework.parsers import JSONParser
+from django.http.response import JsonResponse
 
 
 class BookingViewSet(APIView):
@@ -175,6 +177,40 @@ class BookingViewSet(APIView):
                 booking_instance = booking.objects.get(id=pk)
                 booking_instance.delete()
                 return Response({"message": "Booking deleted successfully"}, status=status.HTTP_200_OK)
+            except booking.DoesNotExist:
+                return Response({"message": "Booking not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+        else:
+            return Response({"message": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
+            
+    #update booking details
+    def put(self, request, *args, **kwargs):
+        userTokens = userView.userViewSet()
+        provided_token = request.META.get('HTTP_AUTHORIZATION')
+        isValidToken = userTokens.validateToken(provided_token)
+
+        if isValidToken:
+            pk = kwargs.get('pk')
+            current_time = timezone.now().time()
+            current_date = timezone.now().date()
+            Reserver = reserver.objects.filter(userId=isValidToken.id).first()
+            reserver_id = Reserver.id
+            try:
+
+                booking_instance = booking.objects.get(id=pk)
+                booking_serializer=BookingSerializer(booking_instance,data={
+                    "Date": current_date,
+                    "Time": current_time,
+                    "reserverId": reserver_id,
+                    "timeId": request.data.get('timeId'),
+                    "slotId": request.data.get('slotId')
+                })
+
+                if booking_serializer.is_valid():
+                    booking_serializer.save()
+                    return Response({"message": "Booking Update successfully"}, status=status.HTTP_200_OK)
+                return Response({"message": "Booking not found"}, status=status.HTTP_404_NOT_FOUND)
             except booking.DoesNotExist:
                 return Response({"message": "Booking not found"}, status=status.HTTP_404_NOT_FOUND)
 
