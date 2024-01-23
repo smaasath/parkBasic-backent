@@ -159,7 +159,54 @@ class BookingViewSet(APIView):
         else:
             return Response({"message": "unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
 
+        # update booking details
+    def put(self, request, *args, **kwargs):
+        userTokens = userView.userViewSet()
+        provided_token = request.META.get('HTTP_AUTHORIZATION')
+        isValidToken = userTokens.validateToken(provided_token)
 
+        if isValidToken:
+            pk = kwargs.get('pk')
+            current_time = timezone.now().time()
+            current_date = timezone.now().date()
+
+            try:
+                Reserver = reserver.objects.get(userId=isValidToken.id)
+                reserver_id = Reserver.id
+                try:
+                    booking_instance = booking.objects.get(id=pk)
+
+                    if reserver_id == booking_instance.reserverId.id:
+                        bookings = booking.objects.filter(Date=current_date,
+                                                          timeId=request.data.get('timeId'),
+                                                          slotId=request.data.get('slotId')).first()
+
+                        if bookings:
+                            return Response({"message": "Slot already booked for this time"}, status=status.HTTP_400_BAD_REQUEST)
+
+                        else:
+                            booking_serializer = BookingSerializer(booking_instance, data={
+                                "Date": current_date,
+                                "Time": current_time,
+                                "timeId": request.data.get('timeId'),
+                                "slotId": request.data.get('slotId')
+                            }, partial=True)
+
+                            if booking_serializer.is_valid():
+                                booking_serializer.save()
+                                return Response({"message": "Booking Update successfully"}, status=status.HTTP_200_OK)
+                            return Response({"message": booking_serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+                    else:
+                        return Response({"message": "Unauthorized" }, status=status.HTTP_401_UNAUTHORIZED)
+                except booking.DoesNotExist:
+                    return Response({"message": "Booking not found"}, status=status.HTTP_404_NOT_FOUND)
+            except reserver.DoesNotExist:
+                return Response({"message": "Reserver not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+        else:
+            return Response({"message": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
     def post(self, request, *args, **kwargs):
