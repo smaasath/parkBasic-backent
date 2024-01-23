@@ -1,9 +1,10 @@
-from .serializers import BookingSlotSerializer
+from .serializers import BookingSlotSerializer,  BookingSerializer
 from rest_framework import status
-from .models import bookingSlot
+from .models import bookingSlot ,booking
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from park_basic import userView
+from django.utils import timezone
 
 
 class BookingSlotView(APIView):
@@ -12,8 +13,13 @@ class BookingSlotView(APIView):
         if pk:
             try:
                 slot = bookingSlot.objects.get(id=pk)
+                current_date = timezone.now().date()
+                slotBooking = booking.objects.filter(Date=current_date,slotId=pk)
+                booking_serializer = BookingSerializer(slotBooking,many=True)
                 serializer = BookingSlotSerializer(slot,many=False)
-                return Response({"data" : serializer.data})
+                return Response({"slot_data" : serializer.data,
+                                 "booking_data":booking_serializer.data,
+                                 },status=status.HTTP_200_OK)
 
             except bookingSlot.DoesNotExist:
                 return Response({"message": "Booking slot not found"}, status=status.HTTP_404_NOT_FOUND)

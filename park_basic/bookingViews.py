@@ -156,6 +156,9 @@ class BookingViewSet(APIView):
             except reserver.DoesNotExist:
                 return Response({"message": "Reserver Not Found"}, status=status.HTTP_404_NOT_FOUND)
 
+        else:
+            return Response({"message": "unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
+
 
 
 
