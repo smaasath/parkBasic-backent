@@ -159,7 +159,7 @@ class BookingViewSet(APIView):
         else:
             return Response({"message": "unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
 
-        # update booking details
+    # update booking details
     def put(self, request, *args, **kwargs):
         userTokens = userView.userViewSet()
         provided_token = request.META.get('HTTP_AUTHORIZATION')

@@ -34,6 +34,7 @@ urlpatterns = [
     path('bookingSlots/', SlotView.BookingSlotView.as_view()),
     path('bookingSlots/<int:pk>', SlotView.BookingSlotView.as_view()),
     path('user/', userView.userViewSet.as_view()),
+    path('user/<int:pk>', userView.userViewSet.as_view()),
 
 
 ]
