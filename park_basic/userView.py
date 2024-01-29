@@ -5,6 +5,7 @@ from .models import reserver, User, booking, bookingSlot
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import ReserverSerializer, UserSerializer
+from django.contrib.auth.hashers import make_password
 
 
 class userViewSet(APIView):
@@ -62,22 +63,40 @@ class userViewSet(APIView):
             user_data = request.data.get('user', {})
             reserver_data = request.data.get('reserver', {})
 
-            try:
-                reserverInstance = reserver.objects.get(userId=userId)
-                userInstance = UserSerializer(instance=isValidToken, data=user_data, partial=True)
-                if userInstance.is_valid():
-                    userInstance.save()
-                    reserverInstance = ReserverSerializer(instance=reserverInstance, data=reserver_data, partial=True)
-                    if reserverInstance.is_valid():
-                        reserverInstance.save()
-                        return Response({"message": "user updated successfully"}, status=status.HTTP_200_OK)
-                    else:
-                        return Response({"message": reserverInstance.errors}, status=status.HTTP_400_BAD_REQUEST)
-                else:
-                    return Response({"Message": userInstance.errors}, status=status.HTTP_400_BAD_REQUEST)
+            if 'oldpassword' in user_data:
+                oldpassword = user_data.get('oldpassword')
+                newpassword =  make_password(user_data.get('password'))
 
-            except reserver.DoesNotExist:
-                return Response({"message": "user not found"}, status=status.HTTP_404_NOT_FOUND)
+
+                # Check if the provided old password matches the existing user password
+                if isValidToken.check_password(oldpassword):
+                    isValidToken.set_password(newpassword)
+                    isValidToken.save()
+                    return Response({"message": "Password updated successfully"}, status=status.HTTP_200_OK)
+
+
+                else:
+                    return Response({"error": "Incorrect old password"}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+
+
+
+                try:
+                    reserverInstance = reserver.objects.get(userId=userId)
+                    userInstance = UserSerializer(instance=isValidToken, data=user_data, partial=True)
+                    if userInstance.is_valid():
+                        userInstance.save()
+                        reserverInstance = ReserverSerializer(instance=reserverInstance, data=reserver_data, partial=True)
+                        if reserverInstance.is_valid():
+                            reserverInstance.save()
+                            return Response({"message": "user updated successfully"}, status=status.HTTP_200_OK)
+                        else:
+                            return Response({"message": reserverInstance.errors}, status=status.HTTP_400_BAD_REQUEST)
+                    else:
+                        return Response({"Message": userInstance.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+                except reserver.DoesNotExist:
+                    return Response({"message": "user not found"}, status=status.HTTP_404_NOT_FOUND)
 
         else:
             return Response({"message": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
