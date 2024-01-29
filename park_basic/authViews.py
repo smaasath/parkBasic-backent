@@ -49,7 +49,8 @@ def RegisterApi(request):
                         "is_superuser": user_instance.is_superuser,
                         "first_name": user_instance.first_name,
                         "last_name": user_instance.last_name,
-                        "email": user_instance.email
+                        "email": user_instance.email,
+                        "username": user_instance.username
                     }
                     return JsonResponse({
                         "user":user_info,
@@ -97,7 +98,8 @@ def LoginApi(request):
                     "is_superuser": user.is_superuser,
                     "first_name": user.first_name,
                     "last_name": user.last_name,
-                    "email": user.email
+                    "email": user.email,
+                    "username": user.username
                 }
                 if Reserver:
                     reserver_info = {
