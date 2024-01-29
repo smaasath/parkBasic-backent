@@ -1,10 +1,15 @@
 from rest_framework import serializers
-from park_basic.models import booking
+from park_basic.models import booking, bookingTime
 from park_basic.models import reserver
 from park_basic.models import bookingSlot
 from django.contrib.auth.models import User
 
 
+
+class BookingTimeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = bookingTime
+        fields = '__all__'
 class BookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = booking

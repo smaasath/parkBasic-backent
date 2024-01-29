@@ -16,13 +16,23 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,re_path
-from django.urls import re_path as url
-from park_basic import authViews
+from park_basic import authViews,SlotView,bookingViews,userView,bookingTime
 from  rest_framework.authtoken.views import obtain_auth_token
+
+
     
 
 urlpatterns = [
     re_path(r'^register$', authViews.RegisterApi),
     re_path(r'^login$', authViews.LoginApi),
     path('admin/', admin.site.urls),
+    path('booking/', bookingViews.BookingViewSet.as_view()),
+    path('booking/<int:pk>', bookingViews.BookingViewSet.as_view()),
+    path('bookingSlots/', SlotView.BookingSlotView.as_view()),
+    path('bookingSlots/<int:pk>', SlotView.BookingSlotView.as_view()),
+    path('user/', userView.userViewSet.as_view()),
+    path('user/<int:pk>', userView.userViewSet.as_view()),
+    path('bookingTime/', bookingTime.BookingTimeView.as_view()),
+
+
 ]
