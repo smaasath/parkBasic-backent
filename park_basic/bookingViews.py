@@ -147,15 +147,24 @@ class BookingViewSet(APIView):
                 return Response({"data": data})
 
         elif isVaidToken:
-            try:
-                Reserver = reserver.objects.get(userId=isVaidToken.id)
-                userBookings = booking.objects.filter(reserverId=Reserver.id)
-                data = self.getAllUserBookingsDetail(userBookings)
-                return Response({"data": data},status=status.HTTP_200_OK)
+            pk = kwargs.get('pk')
+            if pk:
+                try:
+                    Booking = booking.objects.get(id=pk)
+                    data = self.getBookingDetails(Booking)
+                    return Response({"data": data})
+                except booking.DoesNotExist:
+                    return Response({"message": "Booking not found"}, status=status.HTTP_404_NOT_FOUND)
+            else:
 
-            except reserver.DoesNotExist:
-                return Response({"message": "Reserver Not Found"}, status=status.HTTP_404_NOT_FOUND)
+                try:
+                    Reserver = reserver.objects.get(userId=isVaidToken.id)
+                    userBookings = booking.objects.filter(reserverId=Reserver.id)
+                    data = self.getAllUserBookingsDetail(userBookings)
+                    return Response({"data": data},status=status.HTTP_200_OK)
 
+                except reserver.DoesNotExist:
+                    return Response({"message": "Reserver Not Found"}, status=status.HTTP_404_NOT_FOUND)
         else:
             return Response({"message": "unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
 
