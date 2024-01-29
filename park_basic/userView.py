@@ -46,8 +46,8 @@ class userViewSet(APIView):
             try:
                 Reserver = reserver.objects.get(userId=userId)
                 ReserverInstance = ReserverSerializer(instance=Reserver)
-                return Response({"Userdata": userData,
-                                 "ReserverData": ReserverInstance.data}, status=status.HTTP_200_OK)
+                return Response({"user": userData,
+                                 "reserver": ReserverInstance.data}, status=status.HTTP_200_OK)
             except reserver.DoesNotExist:
                 return Response({"message": "Reserver Not Found"}, status=status.HTTP_404_NOT_FOUND)
         else:
